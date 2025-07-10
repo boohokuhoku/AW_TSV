@@ -100,7 +100,7 @@ def process_input_for_tsv(input_text, user_id, user_name):
     return df.to_csv(sep='\t', index=False)
 
 # Streamlit app layout
-st.title("Artwork TSV Generator")
+st.title("TSV Generator")
 
 # User inputs for user_id and user_name
 user_id = st.text_input("User ID:")
