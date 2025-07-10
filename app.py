@@ -103,13 +103,13 @@ def process_input_for_tsv(input_text, user_id, user_name):
 st.title("Artwork TSV Generator")
 
 # User inputs for user_id and user_name
-user_id = st.text_input("User ID:", value="40992246")
-user_name = st.text_input("User Name:", value="afaleecyu")
+user_id = st.text_input("User ID:")
+user_name = st.text_input("User Name:")
 
 # Input for artwork names and AW IDs
 st.write("Enter either two tab-separated columns (Artwork Name, AW IDs) or three tab-separated columns (Artwork Name in Line Sheet, Product Type, AW IDs). Non-English characters and any values before the last non-English character will be removed.")
 input_text = st.text_area("Artwork Names and AW IDs:", 
-                         placeholder="e.g., Moonlake\tSnappy Grip Stand\t35030081",
+                         placeholder="e.g., AppleOragne\tSnappy Grip Stand\t74938468",
                          key="input_text")
 
 # Initialize session state for TSV content
