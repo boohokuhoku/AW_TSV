@@ -126,11 +126,25 @@ def create_id_name_url_table(aw_ids, artwork_names, short_urls):
     })
     return df
 
-# Function to generate TSV file content from DataFrame
-def generate_tsv_file(df):
-    # Convert DataFrame to TSV string
-    tsv_content = df.to_csv(sep='\t', index=False)
-    return tsv_content
+# Function to generate amended TSV file content with additional columns
+def generate_tsv_file(df, amended=False):
+    if amended:
+        # Create DataFrame with all columns from the sample data
+        amended_df = pd.DataFrame({
+            'id': df['AW ID'],
+            'user_id': ['40992246'] * len(df),  # Fixed user_id from sample
+            'user_name': ['afaleecyu'] * len(df),  # Fixed user_name from sample
+            'status': ['N'] * len(df),  # Fixed status from sample
+            'art_work_name': df['Artwork Name'],
+            'art_work_url_name': df['Short URL'],
+            'sell_design_approval_status': ['P'] * len(df),  # Fixed status from sample
+            'is_public': [1] * len(df)  # Fixed is_public from sample
+        })
+        # Convert to TSV string
+        return amended_df.to_csv(sep='\t', index=False)
+    else:
+        # Original TSV with AW ID, Artwork Name, Short URL
+        return df.to_csv(sep='\t', index=False)
 
 # Function to format unique AW IDs for PDP
 def process_for_pdp(aw_ids):
@@ -163,7 +177,8 @@ with st.container():
                 st.session_state.full_table_result = {
                     'df': df,
                     'table_text': df.to_string(index=False),
-                    'tsv_content': generate_tsv_file(df)
+                    'tsv_content': generate_tsv_file(df, amended=False),
+                    'amended_tsv_content': generate_tsv_file(df, amended=True)
                 }
             else:
                 st.session_state.full_table_result = {'error': "No valid numeric AW IDs found in the input."}
@@ -194,12 +209,21 @@ with st.container():
                 <button onclick="copyToClipboardFull()">Copy Table to Clipboard</button>
             """.format(st.session_state.full_table_result['table_text']), unsafe_allow_html=True)
             
-            # Add download button for TSV file
+            # Add download button for original TSV file
             if 'tsv_content' in st.session_state.full_table_result:
                 st.download_button(
-                    label="Download TSV for Google Sheets",
+                    label="Download Original TSV for Google Sheets",
                     data=st.session_state.full_table_result['tsv_content'],
                     file_name="artwork_data.tsv",
+                    mime="text/tab-separated-values"
+                )
+            
+            # Add download button for amended TSV file
+            if 'amended_tsv_content' in st.session_state.full_table_result:
+                st.download_button(
+                    label="Download Amended TSV for Google Sheets",
+                    data=st.session_state.full_table_result['amended_tsv_content'],
+                    file_name="amended_artwork_data.tsv",
                     mime="text/tab-separated-values"
                 )
 
