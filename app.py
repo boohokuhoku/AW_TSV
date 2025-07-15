@@ -56,7 +56,7 @@ def process_input_for_tsv(input_text, user_id, user_name):
         if len(columns) >= 2:
             if len(columns) >= 3:
                 # Three columns: Artwork Name in Line Sheet, Product Type, AW IDs
-                artwork_name_line = clean_non_english(columns[0 strip()]
+                artwork_name_line = clean_non_english(columns[0].strip())
                 product_type = clean_non_english(columns[1].strip())
                 # Apply word replacements
                 artwork_name_line = re.sub(r'\biphone\b', 'phone', artwork_name_line, flags=re.IGNORECASE)
