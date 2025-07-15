@@ -22,12 +22,18 @@ def generate_short_urls(artwork_names):
     name_count = {}
     
     for name in artwork_names:
-        # Convert to lowercase, replace special characters with spaces, and split
-        clean_name = re.sub(r'[^\w\s]', ' ', name.lower()).strip()
+        # Apply word replacements
+        name = re.sub(r'\biphone\b', 'phone', name, flags=re.IGNORECASE)
+        name = re.sub(r'\bipad\b', 'tablet', name, flags=re.IGNORECASE)
+        name = re.sub(r'\bairpods\b', 'earbuds', name, flags=re.IGNORECASE)
+        # Convert to lowercase, replace special characters (except apostrophes) with spaces
+        clean_name = re.sub(r'[^\w\s\']', ' ', name.lower()).strip()
         # Replace multiple spaces with single space and then replace spaces with hyphens
         slug = '-'.join(clean_name.split())
+        # Remove apostrophes
+        slug = slug.replace("'", "")
         
-        # Handle duplicates to match format: e.g., floral-blessing-earbuds-case, floral-blessing-earbuds-case-atwgp1
+        # Handle duplicates to match format: e.g., i-just-cant-sit-still, i-just-cant-sit-still-atwgp1
         if slug in name_count:
             name_count[slug] += 1
             short_urls.append(f"{slug}-atwgp{name_count[slug]}")
@@ -50,8 +56,15 @@ def process_input_for_tsv(input_text, user_id, user_name):
         if len(columns) >= 2:
             if len(columns) >= 3:
                 # Three columns: Artwork Name in Line Sheet, Product Type, AW IDs
-                artwork_name_line = clean_non_english(columns[0].strip())
+                artwork_name_line = clean_non_english(columns[0 strip())
                 product_type = clean_non_english(columns[1].strip())
+                # Apply word replacements
+                artwork_name_line = re.sub(r'\biphone\b', 'phone', artwork_name_line, flags=re.IGNORECASE)
+                artwork_name_line = re.sub(r'\bipad\b', 'tablet', artwork_name_line, flags=re.IGNORECASE)
+                artwork_name_line = re.sub(r'\bairpods\b', 'earbuds', artwork_name_line, flags=re.IGNORECASE)
+                product_type = re.sub(r'\biphone\b', 'phone', product_type, flags=re.IGNORECASE)
+                product_type = re.sub(r'\bipad\b', 'tablet', product_type, flags=re.IGNORECASE)
+                product_type = re.sub(r'\bairpods\b', 'earbuds', product_type, flags=re.IGNORECASE)
                 # Only concatenate if both parts are non-empty
                 if artwork_name_line and product_type:
                     artwork_name = f"{artwork_name_line} {product_type}"
@@ -65,6 +78,10 @@ def process_input_for_tsv(input_text, user_id, user_name):
             else:
                 # Two columns: Artwork Name, AW IDs
                 artwork_name = clean_non_english(columns[0].strip())
+                # Apply word replacements
+                artwork_name = re.sub(r'\biphone\b', 'phone', artwork_name, flags=re.IGNORECASE)
+                artwork_name = re.sub(r'\bipad\b', 'tablet', artwork_name, flags=re.IGNORECASE)
+                artwork_name = re.sub(r'\bairpods\b', 'earbuds', artwork_name, flags=re.IGNORECASE)
                 aw_ids = [token.strip() for token in re.split(r'[,\s]+', clean_non_english(columns[1])) if token.strip() and token.isdigit()]
             
             # Pair each AW ID with the artwork name, if artwork_name is not empty
@@ -107,7 +124,7 @@ user_id = st.text_input("User ID:")
 user_name = st.text_input("User Name:")
 
 # Input for artwork names and AW IDs
-st.write("Enter either two tab-separated columns (Artwork Name, AW IDs) or three tab-separated columns (Artwork Name in Line Sheet, Product Type, AW IDs). Non-English characters and any values before the last non-English character will be removed.")
+st.write("Enter either two tab-separated columns (Artwork Name, AW IDs) or three tab-separated columns (Artwork Name in Line Sheet, Product Type, AW IDs). Non-English characters and any values before the last non-English character will be removed. Words like 'iphone', 'ipad', and 'airpods' will be replaced with 'phone', 'tablet', and 'earbuds' respectively in Artwork Name and Short URL. Apostrophes are removed in Short URLs (e.g., 'can't' becomes 'cant' in Short URL).")
 input_text = st.text_area("Artwork Names and AW IDs:", 
                          placeholder="",
                          key="input_text")
